@@ -125,25 +125,26 @@ function supplierName(id){var s=suppliers.find(function(x){return x.id===id});re
 /* ============================================================
    GENERIC DB
    ============================================================ */
-async function dbUpsert(table,payload){
-  var r=await sup.from(table)
-    .upsert(payload,{onConflict:"id"})
+async function dbUpsert(table, payload) {
+  const { data, error } = await sup
+    .from(table)
+    .upsert(payload, { onConflict: "id" })
     .select()
     .single();
 
-  if(r.error){
-    console.error("SUPABASE UPSERT ERROR:",r.error);
+  if (error) {
+    console.error("SUPABASE UPSERT ERROR:", error);
     throw new Error(
-      "Supabase: "+
-      (r.error.message||"error")+
-      " | code="+
-      (r.error.code||"")+
-      " | details="+
-      (r.error.details||"")
+      "Supabase: " +
+      (error.message || "error") +
+      " | code=" +
+      (error.code || "") +
+      " | details=" +
+      (error.details || "")
     );
   }
 
-  return r.data;
+  return data;
 }
 async function dbDeleteRow(table,id){
   var r=await supa.from(table).delete().eq("id",id);
