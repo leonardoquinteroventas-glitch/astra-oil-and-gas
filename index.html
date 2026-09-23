@@ -1362,7 +1362,7 @@ function initSupabase(){
 
     initSupabase();
 
-    const { data, error, status, statusText } = await sup
+    const { data, error, status, statusText } = await astraDB
       .from(SUPPLIER_TABLE)
       .select("id")
       .limit(1);
@@ -1416,36 +1416,7 @@ function initSupabase(){
     return false;
   }
 }
-    return true;
-
-  }catch(e){
-
-    console.error(
-      "ASTRADB CONNECTION EXCEPTION:",
-      e
-    );
-
-    cloudConnected=false;
-
-    updateConnection(
-      false,
-      "AstraDB · error"
-    );
-
-    setDBStatus(
-      "Error de conexión: "+
-      (e.message||e),
-      "error"
-    );
-
-    if(showToast){
-      toast(
-        "Error de conexión con AstraDB."
-      );
-    }
-
-    return false;
-  }
+ 
 }
 
 
