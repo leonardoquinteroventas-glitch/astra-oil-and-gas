@@ -2875,7 +2875,7 @@ async function saveSupplier(){
     if(!cloudConnected){
 
       const connected=
-        await connectAstraDB(false);
+        await connectAstraDB(true);
 
       if(!connected){
 
