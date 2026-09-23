@@ -1,0 +1,2807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Astra Procurement Intelligence OS</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#f4f6f8;
+  --panel:#ffffff;
+  --panel2:#f8fafb;
+  --text:#17212b;
+  --muted:#66727d;
+  --line:#dce2e7;
+  --blue:#00aeef;
+  --red:#ed1c24;
+  --orange:#f7941d;
+  --green:#39b54a;
+  --yellow:#fdbe21;
+  --navy:#17212b;
+  --shadow:0 8px 24px rgba(23,33,43,.08);
+  --radius:14px;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+
+.app{
+  min-height:100vh;
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:245px;
+  background:#fff;
+  border-right:1px solid var(--line);
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+}
+
+.brand{
+  padding:22px 20px 18px;
+  border-bottom:1px solid var(--line);
+}
+.brand img{
+  width:170px;
+  max-width:100%;
+  display:block;
+}
+.brand-sub{
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:1.5px;
+  margin-top:8px;
+  text-transform:uppercase;
+}
+
+.nav{
+  padding:14px 10px;
+  flex:1;
+}
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  text-align:left;
+  padding:12px 13px;
+  border-radius:10px;
+  color:#596570;
+  margin-bottom:4px;
+  font-weight:600;
+}
+.nav button:hover{
+  background:#f2f5f7;
+  color:var(--text);
+}
+.nav button.active{
+  background:#eaf8fd;
+  color:#008fca;
+  box-shadow:inset 3px 0 0 var(--blue);
+}
+
+.sidebar-bottom{
+  padding:14px;
+  border-top:1px solid var(--line);
+}
+.mode-pill{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:800;
+  padding:9px 10px;
+  border-radius:9px;
+  background:#f2f4f6;
+  color:#68737c;
+}
+.mode-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#aab2b9;
+}
+.mode-pill.cloud{
+  background:#ecfaef;
+  color:#238037;
+}
+.mode-pill.cloud .mode-dot{background:var(--green)}
+
+/* MAIN */
+.main{
+  margin-left:245px;
+  width:calc(100% - 245px);
+  min-height:100vh;
+}
+.topbar{
+  height:72px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.page-title{
+  font-size:21px;
+  font-weight:800;
+}
+.top-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.connection{
+  font-size:11px;
+  font-weight:800;
+  padding:8px 11px;
+  border-radius:8px;
+  background:#f1f3f5;
+  color:#69747d;
+}
+.connection.ok{
+  background:#eaf8ee;
+  color:#25823b;
+}
+
+.content{
+  padding:26px;
+  max-width:1600px;
+  margin:auto;
+}
+
+/* CARDS */
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+.metric{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+.metric-label{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.metric-value{
+  font-size:31px;
+  font-weight:900;
+  margin-top:6px;
+}
+.metric-line{
+  height:4px;
+  border-radius:3px;
+  margin-top:13px;
+  background:var(--blue);
+}
+.metric:nth-child(2) .metric-line{background:var(--green)}
+.metric:nth-child(3) .metric-line{background:var(--orange)}
+.metric:nth-child(4) .metric-line{background:var(--yellow)}
+.metric:nth-child(5) .metric-line{background:var(--red)}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:18px;
+}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:20px;
+  margin-bottom:18px;
+}
+.card-title{
+  font-size:16px;
+  font-weight:850;
+  margin-bottom:15px;
+}
+.card-sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:-8px;
+  margin-bottom:16px;
+}
+
+/* TOOLBAR */
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:16px;
+}
+.search{
+  flex:1;
+  min-width:240px;
+}
+input,select,textarea{
+  border:1px solid #d5dce2;
+  border-radius:9px;
+  background:#fff;
+  color:var(--text);
+  padding:10px 11px;
+  outline:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,174,239,.10);
+}
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+.btn{
+  border:1px solid #d4dbe0;
+  background:#fff;
+  color:#34414c;
+  padding:10px 13px;
+  border-radius:9px;
+  font-weight:750;
+}
+.btn:hover{background:#f5f7f8}
+.btn-primary{
+  background:var(--blue);
+  color:#fff;
+  border-color:var(--blue);
+}
+.btn-green{
+  background:var(--green);
+  color:#fff;
+  border-color:var(--green);
+}
+.btn-danger{
+  background:#fff0f1;
+  color:#c91c24;
+  border-color:#ffd1d4;
+}
+
+/* TABLE */
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1080px;
+}
+th{
+  background:#f6f8f9;
+  text-align:left;
+  padding:11px 12px;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  color:#68737d;
+  border-bottom:1px solid var(--line);
+}
+td{
+  padding:12px;
+  border-bottom:1px solid #edf0f2;
+  font-size:12px;
+  vertical-align:middle;
+}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:#fbfcfc}
+
+.company{
+  font-weight:850;
+}
+.code{
+  font-size:10px;
+  color:#8a959e;
+  margin-top:3px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:850;
+  white-space:nowrap;
+}
+.badge-green{background:#e9f8ed;color:#237b38}
+.badge-orange{background:#fff2df;color:#a96200}
+.badge-yellow{background:#fff8d9;color:#856b00}
+.badge-red{background:#ffe9eb;color:#bd1c25}
+.badge-blue{background:#e6f7fd;color:#007fae}
+.badge-grey{background:#edf0f2;color:#69747d}
+
+.price{
+  font-weight:850;
+  white-space:nowrap;
+}
+.muted{color:var(--muted)}
+
+.priority-main{
+  border-left:4px solid var(--green);
+}
+.priority-contact{
+  border-left:4px solid var(--orange);
+}
+.priority-unworked{
+  border-left:4px solid #d7dde2;
+}
+
+/* DETAIL */
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.field{
+  background:#f8fafb;
+  border:1px solid #e5e9ec;
+  border-radius:10px;
+  padding:11px;
+}
+.field-label{
+  font-size:9px;
+  color:#7a858e;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+}
+.field-value{
+  font-size:12px;
+  font-weight:700;
+  margin-top:5px;
+  word-break:break-word;
+}
+.field-wide{grid-column:1/-1}
+
+.dd-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.dd{
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:13px;
+  background:#fff;
+}
+.dd-title{
+  font-size:11px;
+  font-weight:850;
+}
+.dd-status{
+  margin-top:8px;
+}
+.dd-note{
+  font-size:10px;
+  color:var(--muted);
+  margin-top:7px;
+  line-height:1.45;
+}
+
+/* PROGRESS */
+.progress{
+  height:8px;
+  background:#e9edf0;
+  border-radius:20px;
+  overflow:hidden;
+}
+.progress > span{
+  display:block;
+  height:100%;
+  border-radius:20px;
+  background:var(--green);
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(20,28,35,.48);
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modal.show{display:flex}
+.modal-box{
+  width:min(1100px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 25px 70px rgba(0,0,0,.25);
+}
+.modal-head{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:17px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.modal-head h2{
+  margin:0;
+  font-size:18px;
+}
+.modal-body{padding:20px}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.form-group label{
+  font-size:10px;
+  font-weight:850;
+  color:#68737d;
+  text-transform:uppercase;
+}
+.form-group.wide{grid-column:1/-1}
+.modal-footer{
+  position:sticky;
+  bottom:0;
+  background:#fff;
+  border-top:1px solid var(--line);
+  padding:14px 20px;
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+}
+
+/* PRODUCTS / CONTACTS */
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.product-card{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  background:#fff;
+}
+.product-name{
+  font-size:15px;
+  font-weight:850;
+}
+.product-meta{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:6px;
+  line-height:1.5;
+}
+
+.contact-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.contact{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:15px;
+}
+.contact-name{
+  font-weight:850;
+}
+.contact-company{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.contact-line{
+  font-size:11px;
+  margin-top:9px;
+}
+
+/* MAP */
+.map{
+  min-height:470px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 35% 35%,rgba(0,174,239,.10),transparent 24%),
+    radial-gradient(circle at 65% 50%,rgba(57,181,74,.10),transparent 25%),
+    #f8fafb;
+  position:relative;
+  overflow:hidden;
+}
+.map-title{
+  position:absolute;
+  left:20px;
+  top:18px;
+  font-weight:850;
+}
+.region{
+  position:absolute;
+  padding:10px 14px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  font-size:11px;
+  font-weight:850;
+}
+.region span{
+  display:block;
+  color:var(--muted);
+  font-size:9px;
+  margin-top:4px;
+}
+.rj{right:15%;bottom:28%}
+.sp{right:28%;bottom:36%}
+.pr{right:40%;bottom:46%}
+.go{right:48%;top:35%}
+.sc{right:31%;bottom:24%}
+.ba{right:18%;top:25%}
+.co{left:18%;top:20%}
+
+/* DOCUMENTS */
+.doc-list{
+  display:grid;
+  gap:10px;
+}
+.doc{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.doc-main{
+  min-width:0;
+}
+.doc-name{
+  font-weight:800;
+  font-size:12px;
+}
+.doc-meta{
+  color:var(--muted);
+  font-size:10px;
+  margin-top:3px;
+}
+
+/* CONFIG */
+.config-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+.config-note{
+  padding:13px;
+  border-radius:10px;
+  background:#f5f8fa;
+  border:1px solid var(--line);
+  font-size:11px;
+  line-height:1.55;
+}
+.success{
+  color:#267f3a;
+  font-weight:800;
+}
+.warning{
+  color:#a46200;
+  font-weight:800;
+}
+.error{
+  color:#c21f27;
+  font-weight:800;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:200;
+  background:#17212b;
+  color:#fff;
+  padding:12px 15px;
+  border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
+  font-size:12px;
+  font-weight:700;
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:.2s;
+}
+.toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* MOBILE */
+@media(max-width:1100px){
+  .metrics{grid-template-columns:repeat(3,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .product-grid,.contact-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid,.detail-grid,.dd-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .sidebar{
+    width:70px;
+  }
+  .brand{
+    padding:15px 10px;
+  }
+  .brand img{width:50px;object-fit:contain}
+  .brand-sub,.nav button span,.sidebar-bottom{display:none}
+  .nav button{
+    text-align:center;
+    font-size:0;
+  }
+  .nav button:first-letter{font-size:18px}
+  .main{
+    margin-left:70px;
+    width:calc(100% - 70px);
+  }
+  .content{padding:15px}
+  .topbar{padding:0 15px}
+  .metrics{grid-template-columns:1fr 1fr}
+  .product-grid,.contact-grid,.form-grid,.detail-grid,.dd-grid,.config-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+</head>
+
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="https://astraoilandgas.com/wp-content/uploads/2024/07/Astra_Logo_Horizontal_w-300x118.png" alt="Astra Oil and Gas">
+      <div class="brand-sub">Procurement Intelligence OS</div>
+    </div>
+
+    <nav class="nav">
+      <button class="active" data-page="dashboard"><span>Resumen</span></button>
+      <button data-page="suppliers"><span>Proveedores</span></button>
+      <button data-page="products"><span>Productos</span></button>
+      <button data-page="contacts"><span>Contactos</span></button>
+      <button data-page="documents"><span>Documentación</span></button>
+      <button data-page="map"><span>Mapa mental</span></button>
+      <button data-page="intelligence"><span>Inteligencia</span></button>
+      <button data-page="settings"><span>Configuración</span></button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div id="modePill" class="mode-pill">
+        <span class="mode-dot"></span>
+        <span id="modeText">LOCAL</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div id="pageTitle" class="page-title">Resumen</div>
+
+      <div class="top-actions">
+        <div id="connection" class="connection">AstraDB · desconectado</div>
+        <button class="btn" id="refreshBtn">Actualizar</button>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page">
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Proveedores</div>
+            <div id="mSuppliers" class="metric-value">0</div>
+            <div class="metric-line"></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Verificados</div>
+            <div id="mVerified" class="metric-value">0</div>
+            <div class="metric-line"></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">En diligencia</div>
+            <div id="mReview" class="metric-value">0</div>
+            <div class="metric-line"></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Pendientes</div>
+            <div id="mPending" class="metric-value">0</div>
+            <div class="metric-line"></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Documentos</div>
+            <div id="mDocs" class="metric-value">0</div>
+            <div class="metric-line"></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+
+          <div class="card">
+            <div class="card-title">Pipeline de supply</div>
+            <div class="card-sub">Lectura operativa de las oportunidades actualmente cargadas.</div>
+
+            <div id="pipelineDashboard"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Prioridad actual</div>
+            <div class="card-sub">Las estructuras que requieren atención inmediata.</div>
+
+            <div id="priorityDashboard"></div>
+          </div>
+
+        </div>
+
+        <div class="card">
+          <div class="card-title">Principio operativo</div>
+          <div class="config-note">
+            <strong>No buscamos basura. Buscamos descuento operativo.</strong><br><br>
+            El objetivo es identificar corrientes que perdieron valor comercial,
+            pero que todavía mantienen eficiencia suficiente para procesamiento,
+            logística estable, consistencia y repetibilidad.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUPPLIERS -->
+      <div id="page-suppliers" class="page" style="display:none">
+
+        <div class="card">
+          <div class="toolbar">
+            <input id="supplierSearch" class="search" placeholder="Buscar proveedor, producto, ciudad, CNPJ, contacto...">
+            <select id="supplierStatusFilter">
+              <option value="all">Todos los estados</option>
+              <option value="verified">Verificados</option>
+              <option value="review">En diligencia</option>
+              <option value="pending">Pendientes</option>
+              <option value="risk">Riesgo</option>
+            </select>
+            <select id="supplierRegionFilter">
+              <option value="all">Todos los países</option>
+              <option value="Brasil">Brasil</option>
+              <option value="Colombia">Colombia</option>
+              <option value="Chile">Chile</option>
+              <option value="Perú">Perú</option>
+              <option value="Ecuador">Ecuador</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Uruguay">Uruguay</option>
+            </select>
+            <button class="btn btn-primary" id="newSupplierBtn">+ Proveedor</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Proveedor</th>
+                  <th>Ubicación</th>
+                  <th>Producto</th>
+                  <th>FFA</th>
+                  <th>Capacidad</th>
+                  <th>Precio</th>
+                  <th>Incoterm</th>
+                  <th>Estado</th>
+                  <th>DD</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="supplierTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="supplierDetail"></div>
+
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="page-products" class="page" style="display:none">
+        <div class="card">
+          <div class="card-title">Productos / Feedstocks</div>
+          <div class="card-sub">Agregación automática de las corrientes declaradas por los proveedores.</div>
+          <div id="productsGrid" class="product-grid"></div>
+        </div>
+      </div>
+
+      <!-- CONTACTS -->
+      <div id="page-contacts" class="page" style="display:none">
+        <div class="card">
+          <div class="card-title">Contactos operativos</div>
+          <div class="card-sub">Personas vinculadas a las estructuras de supply.</div>
+          <div id="contactsGrid" class="contact-grid"></div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div id="page-documents" class="page" style="display:none">
+        <div class="card">
+          <div class="card-title">Documentación</div>
+          <div class="card-sub">
+            Evidencia: COA, SGS, ISCC, fotografías, licencias, BL, contratos y documentos legales.
+          </div>
+
+          <div class="toolbar">
+            <select id="docSupplierFilter">
+              <option value="">Todos los proveedores</option>
+            </select>
+            <input id="docFile" type="file">
+            <select id="docCategory">
+              <option>ISCC</option>
+              <option>Fotos</option>
+              <option>COA</option>
+              <option>SGS</option>
+              <option>Ficha técnica</option>
+              <option>Legal</option>
+              <option>BL</option>
+              <option>Licencia ambiental</option>
+              <option>Contrato</option>
+              <option>Otro</option>
+            </select>
+            <button class="btn btn-primary" id="uploadDocBtn">Guardar documento</button>
+          </div>
+
+          <div id="documentsList" class="doc-list"></div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div id="page-map" class="page" style="display:none">
+        <div class="card">
+          <div class="card-title">Mapa de supply LATAM</div>
+          <div class="card-sub">Lectura geográfica del pipeline actual.</div>
+
+          <div class="map">
+            <div class="map-title">Feedstock intelligence map</div>
+
+            <div class="region co">
+              Colombia
+              <span>Palma · CPO off-spec · oleínas</span>
+            </div>
+
+            <div class="region ba">
+              Bahia
+              <span>Derivados de palma</span>
+            </div>
+
+            <div class="region go">
+              Goiás
+              <span>Renovar · corrientes mixtas</span>
+            </div>
+
+            <div class="region sp">
+              São Paulo
+              <span>Olam · UCO · oleaginosas</span>
+            </div>
+
+            <div class="region pr">
+              Paraná
+              <span>Ácidos grasos · residuos soja</span>
+            </div>
+
+            <div class="region sc">
+              Santa Catarina
+              <span>UCO · tratamiento</span>
+            </div>
+
+            <div class="region rj">
+              Rio de Janeiro
+              <span>UCO · aceites recuperados</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTELLIGENCE -->
+      <div id="page-intelligence" class="page" style="display:none">
+
+        <div class="grid2">
+
+          <div class="card">
+            <div class="card-title">Marco de evaluación</div>
+
+            <div class="dd-grid">
+              <div class="dd">
+                <div class="dd-title">1. Existencia legal</div>
+                <div class="dd-note">CNPJ, razón social, CNAE, administrador, registros.</div>
+              </div>
+
+              <div class="dd">
+                <div class="dd-title">2. Capacidad operativa</div>
+                <div class="dd-note">Planta, almacenamiento, producción, bombeabilidad y continuidad.</div>
+              </div>
+
+              <div class="dd">
+                <div class="dd-title">3. Calidad</div>
+                <div class="dd-note">FFA, humedad, MIU, insolubles, iodine, TFM/TFA y estabilidad.</div>
+              </div>
+
+              <div class="dd">
+                <div class="dd-title">4. Historial exportador</div>
+                <div class="dd-note">BL, puertos, destinos, experiencia internacional.</div>
+              </div>
+
+              <div class="dd">
+                <div class="dd-title">5. Riesgo comercial</div>
+                <div class="dd-note">Precio, payment terms, intermediarios, garantías y consistencia.</div>
+              </div>
+
+              <div class="dd">
+                <div class="dd-title">6. Compliance</div>
+                <div class="dd-note">ISCC, licencias, trazabilidad y documentación.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Regla de procurement</div>
+            <div class="config-note">
+              <strong>El papel debe comportarse como el producto.</strong>
+              <br><br>
+              Parámetros demasiado perfectos, procedimientos incoherentes,
+              SBLC antes de evidencia del material, precios irreales o exceso
+              de intermediación deben aumentar el nivel de diligencia.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card">
+          <div class="card-title">Prioridad de mercado</div>
+
+          <div class="detail-grid">
+            <div class="field">
+              <div class="field-label">Brasil</div>
+              <div class="field-value">Soja · residuos industriales · rendering · Paranaguá</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Colombia</div>
+              <div class="field-value">Palma · CPO off-spec · oleínas · retornos industriales</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Expansión</div>
+              <div class="field-value">Ecuador · Perú · Argentina · Uruguay</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="page-settings" class="page" style="display:none">
+
+        <div class="config-grid">
+
+          <div class="card">
+            <div class="card-title">AstraDB</div>
+
+            <div class="form-group">
+              <label>Supabase URL</label>
+              <input id="cfgUrl" readonly>
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="form-group">
+              <label>Publishable Key</label>
+              <input id="cfgKey" readonly>
+            </div>
+
+            <div style="height:15px"></div>
+
+            <button class="btn btn-green" id="connectBtn">
+              Conectar a AstraDB
+            </button>
+
+            <button class="btn" id="cloudLoadBtn">
+              Cargar datos compartidos
+            </button>
+
+            <div style="height:14px"></div>
+
+            <div id="dbStatus" class="config-note">
+              Estado: verificando configuración...
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Persistencia</div>
+
+            <div class="config-note">
+              Los datos locales se conservan en el navegador.
+              <br><br>
+              Cuando AstraDB está conectado, el sistema puede trabajar
+              en modo compartido usando Supabase como fuente común.
+              <br><br>
+              La aplicación nunca elimina automáticamente los datos locales
+              cuando una conexión remota falla.
+            </div>
+
+            <div style="height:12px"></div>
+
+            <button class="btn" id="exportBtn">Exportar JSON</button>
+            <button class="btn btn-danger" id="resetLocalBtn">Restablecer datos locales</button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<!-- SUPPLIER MODAL -->
+<div id="supplierModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h2 id="modalTitle">Nuevo proveedor</h2>
+      <button class="btn" id="closeModalBtn">Cerrar</button>
+    </div>
+
+    <div class="modal-body">
+
+      <input type="hidden" id="fId">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Empresa</label>
+          <input id="fCompany">
+        </div>
+
+        <div class="form-group">
+          <label>País</label>
+          <input id="fCountry">
+        </div>
+
+        <div class="form-group">
+          <label>Ubicación</label>
+          <input id="fLocation">
+        </div>
+
+        <div class="form-group">
+          <label>CNPJ / Registro</label>
+          <input id="fCnpj">
+        </div>
+
+        <div class="form-group">
+          <label>CNAE</label>
+          <input id="fCnae">
+        </div>
+
+        <div class="form-group">
+          <label>Administrador</label>
+          <input id="fAdmin">
+        </div>
+
+        <div class="form-group">
+          <label>Manager / Contacto</label>
+          <input id="fManager">
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input id="fPhone">
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input id="fWhatsapp">
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input id="fEmail">
+        </div>
+
+        <div class="form-group">
+          <label>Website</label>
+          <input id="fWebsite">
+        </div>
+
+        <div class="form-group">
+          <label>Producto</label>
+          <input id="fProduct">
+        </div>
+
+        <div class="form-group wide">
+          <label>Origen / proceso del material</label>
+          <textarea id="fOrigin"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>FFA</label>
+          <input id="fFfa">
+        </div>
+
+        <div class="form-group">
+          <label>Humedad</label>
+          <input id="fMoisture">
+        </div>
+
+        <div class="form-group">
+          <label>MIU</label>
+          <input id="fMiu">
+        </div>
+
+        <div class="form-group">
+          <label>Insolubles</label>
+          <input id="fInsolubles">
+        </div>
+
+        <div class="form-group">
+          <label>Iodine</label>
+          <input id="fIodine">
+        </div>
+
+        <div class="form-group">
+          <label>TFM / TFA</label>
+          <input id="fTfm">
+        </div>
+
+        <div class="form-group">
+          <label>Capacidad</label>
+          <input id="fCapacity">
+        </div>
+
+        <div class="form-group">
+          <label>Consistencia mensual</label>
+          <input id="fConsistency">
+        </div>
+
+        <div class="form-group">
+          <label>Precio</label>
+          <input id="fPrice">
+        </div>
+
+        <div class="form-group">
+          <label>Moneda</label>
+          <input id="fCurrency">
+        </div>
+
+        <div class="form-group">
+          <label>Incoterm</label>
+          <input id="fIncoterm">
+        </div>
+
+        <div class="form-group">
+          <label>Pago</label>
+          <input id="fPayment">
+        </div>
+
+        <div class="form-group">
+          <label>ISCC</label>
+          <input id="fIscc">
+        </div>
+
+        <div class="form-group">
+          <label>Historial exportador</label>
+          <input id="fExportHistory">
+        </div>
+
+        <div class="form-group wide">
+          <label>Logística</label>
+          <textarea id="fLogistics"></textarea>
+        </div>
+
+        <div class="form-group wide">
+          <label>Licencia ambiental</label>
+          <input id="fEnvironmental">
+        </div>
+
+        <div class="form-group wide">
+          <label>Notas de evidencia</label>
+          <textarea id="fEvidence"></textarea>
+        </div>
+
+        <div class="form-group wide">
+          <label>Notas internas</label>
+          <textarea id="fInternal"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" id="cancelModalBtn">Cancelar</button>
+      <button class="btn btn-primary" id="saveSupplierBtn">Guardar proveedor</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ============================================================
+   ASTRA PROCUREMENT INTELLIGENCE OS
+   V8 — SINGLE FILE
+   Supabase embedded configuration
+   ============================================================ */
+
+const SUPABASE_URL =
+  "https://iplpvmrxhvuuszzwrgta.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwbHB2bXJ4aHZ1dXN6endyZ3RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNTQ0ODIsImV4cCI6MjEwNTYzMDQ4Mn0.zDWFeswSTAONX7Bqxz70dsQmSve8yEbEgEVKIltUlHs";
+
+const SUPPLIER_TABLE = "suppliers";
+const DOCUMENT_TABLE = "Documentos";
+const STORAGE_BUCKET = "astra-docs";
+
+const LOCAL_KEY = "ASTRA_PROCUREMENT_OS_MASTER_V8";
+const DOC_LOCAL_KEY = "ASTRA_PROCUREMENT_DOCS_V8";
+
+let astraDB = null;
+let cloudConnected = false;
+let suppliers = [];
+let documents = [];
+let selectedSupplierId = null;
+let editingSupplierId = null;
+
+/* ============================================================
+   SUPABASE
+   ============================================================ */
+
+function initSupabase(){
+  try{
+    if(
+      window.supabase &&
+      SUPABASE_URL &&
+      SUPABASE_PUBLISHABLE_KEY
+    ){
+      astraDB = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+      return true;
+    }
+  }catch(e){
+    console.error("ASTRADB INIT ERROR:",e);
+  }
+  return false;
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function value(v, fallback="PENDIENTE DE CONFIRMAR"){
+  if(v===null || v===undefined || String(v).trim()==="") return fallback;
+  return String(v);
+}
+
+function toast(message){
+  const el=document.getElementById("toast");
+  el.textContent=message;
+  el.classList.add("show");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+  },2800);
+}
+
+function saveLocal(){
+  localStorage.setItem(LOCAL_KEY,JSON.stringify(suppliers));
+  localStorage.setItem(DOC_LOCAL_KEY,JSON.stringify(documents));
+}
+
+function loadLocal(){
+  try{
+    const s=JSON.parse(localStorage.getItem(LOCAL_KEY)||"[]");
+    const d=JSON.parse(localStorage.getItem(DOC_LOCAL_KEY)||"[]");
+
+    suppliers=Array.isArray(s)?s:[];
+    documents=Array.isArray(d)?d:[];
+  }catch(e){
+    suppliers=[];
+    documents=[];
+  }
+}
+
+function nextSupplierCode(){
+  let max=0;
+
+  suppliers.forEach(s=>{
+    const n=parseInt(String(s.code||"").replace(/\D/g,""),10);
+    if(Number.isFinite(n)) max=Math.max(max,n);
+  });
+
+  return "SUP-"+String(max+1).padStart(3,"0");
+}
+
+function normalizedText(v){
+  return String(v||"")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase();
+}
+
+function isMainSupplier(s){
+  if(["AST-001","AST-002","AST-003"].includes(s.code)){
+    return true;
+  }
+  const n=normalizedText(s.company);
+  return [
+    "olam agroindustrial",
+    "renovar oleos vegetais",
+    "fl oleos"
+  ].includes(n);
+}
+
+function isContacted(s){
+  if(s.contacted !== undefined) return !!s.contacted;
+  return ["review","verified","risk"].includes(s.status);
+}
+
+/* ============================================================
+   STATUS / DD
+   ============================================================ */
+
+function ddState(s, domain){
+  const dd=s.dd || {};
+
+  if(dd[domain]) return dd[domain];
+
+  if(isMainSupplier(s)) return "verified";
+
+  if(
+    s.evidence ||
+    s.manager ||
+    s.phone ||
+    s.email ||
+    s.product
+  ) return "review";
+
+  return "pending";
+}
+
+function statusOf(s){
+
+  if(s.status && ["verified","review","pending","risk"].includes(s.status)){
+    return s.status;
+  }
+
+  if(isMainSupplier(s)){
+    return "verified";
+  }
+
+  const states=[
+    ddState(s,"legal"),
+    ddState(s,"operations"),
+    ddState(s,"quality"),
+    ddState(s,"export"),
+    ddState(s,"commercial"),
+    ddState(s,"compliance")
+  ];
+
+  if(states.includes("risk")) return "risk";
+
+  if(
+    states.every(x=>x==="verified")
+  ) return "verified";
+
+  if(
+    states.includes("verified") ||
+    states.includes("review")
+  ) return "review";
+
+  return "pending";
+}
+
+function verificationPercent(s){
+  const domains=[
+    "legal",
+    "operations",
+    "quality",
+    "export",
+    "commercial",
+    "compliance"
+  ];
+
+  const score={
+    verified:1,
+    review:.5,
+    pending:0,
+    risk:0
+  };
+
+  const total=domains.reduce(
+    (sum,d)=>sum+score[ddState(s,d)],
+    0
+  );
+
+  return Math.round(total/domains.length*100);
+}
+
+function statusBadge(s){
+  const st=statusOf(s);
+
+  const map={
+    verified:["badge-green","VERIFICADO"],
+    review:["badge-orange","EN DILIGENCIA"],
+    pending:["badge-grey","PENDIENTE"],
+    risk:["badge-red","RIESGO"]
+  };
+
+  const [cls,label]=map[st];
+
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+/* ============================================================
+   SEEDED DATA
+   ============================================================ */
+
+const SEED_SUPPLIERS = [];
+
+/* SEED_SUPPLIERS removed — Supabase is now the single source of truth.
+   No mock/seed data. All suppliers come from the suppliers table in Supabase.
+*/
+
+/* ============================================================
+   INIT — Supabase is the single source of truth
+   ============================================================ */
+
+function initializeData(){
+  suppliers=[];
+  documents=[];
+}
+
+/* ============================================================
+   CLOUD LOAD
+   ============================================================ */
+
+async function connectAstraDB(showToast=true){
+
+  if(!astraDB){
+    initSupabase();
+  }
+
+  if(!astraDB){
+    updateConnection(false,"AstraDB · error");
+    setDBStatus("No fue posible inicializar el cliente Supabase.","error");
+    return false;
+  }
+
+  setDBStatus("Probando conexión con AstraDB...");
+
+  try{
+
+    const {data,error}=await astraDB
+      .from(SUPPLIER_TABLE)
+      .select("*")
+      .limit(1);
+
+    if(error){
+      console.error("ASTRADB ERROR:",error);
+      cloudConnected=false;
+      updateConnection(false,"AstraDB · error");
+      setDBStatus(
+        "AstraDB respondió con un error: "+(error.message||"error desconocido"),
+        "error"
+      );
+      return false;
+    }
+
+    cloudConnected=true;
+    updateConnection(true,"AstraDB · compartido");
+
+    setDBStatus(
+      "Conexión correcta. AstraDB está disponible.",
+      "success"
+    );
+
+    if(showToast) toast("AstraDB conectado correctamente.");
+
+    return true;
+
+  }catch(error){
+
+    console.error("ASTRADB EXCEPTION:",error);
+
+    cloudConnected=false;
+    updateConnection(false,"AstraDB · error");
+
+    setDBStatus(
+      "Error de conexión: "+(error.message||"error desconocido"),
+      "error"
+    );
+
+    return false;
+  }
+}
+
+async function loadCloudSuppliers(showToast=false){
+
+  if(!cloudConnected){
+    const ok=await connectAstraDB(false);
+    if(!ok) return false;
+  }
+
+  try{
+
+    const {data,error}=await astraDB
+      .from(SUPPLIER_TABLE)
+      .select("*")
+      .order("created_at",{ascending:true});
+
+    if(error){
+      console.error("CLOUD LOAD ERROR:",error);
+      setDBStatus(
+        "Conexión disponible, pero no se pudieron cargar los proveedores: "+
+        (error.message||"error"),
+        "error"
+      );
+      return false;
+    }
+
+    suppliers=Array.isArray(data) ? data.map(normalizeCloudSupplier) : [];
+    saveLocal();
+
+    renderAll();
+
+    setDBStatus(
+      `AstraDB cargado: ${suppliers.length} proveedores.`,
+      "success"
+    );
+
+    if(showToast) toast(`Datos cargados desde AstraDB: ${suppliers.length} proveedores.`);
+
+    return true;
+
+  }catch(error){
+
+    console.error("CLOUD LOAD EXCEPTION:",error);
+
+    setDBStatus(
+      "Error cargando datos: "+(error.message||"error"),
+      "error"
+    );
+
+    return false;
+  }
+}
+
+function normalizeCloudSupplier(row){
+
+  const meta=row.metadata||{};
+
+  return {
+    ...row,
+    id:row.id || crypto.randomUUID(),
+    code:row.code || nextSupplierCode(),
+    company:row.company || row.name || "PENDIENTE",
+    country:row.country || "Brasil",
+    location:row.location || row.city || "PENDIENTE",
+    product:row.product || row.producto || "PENDIENTE",
+    ffa:row.ffa || "PENDIENTE",
+    capacity:row.capacity || "PENDIENTE",
+    price:row.price || "PENDIENTE",
+    currency:row.currency || "USD/MT",
+    incoterm:row.incoterm || "PENDIENTE",
+    exportHistory:row.export_history || row.exportHistory || "PENDIENTE",
+    dd:meta.dd || row.dd || {},
+    contacted:meta.contacted !== undefined ? meta.contacted : !!row.contacted
+  };
+}
+
+/* ============================================================
+   CLOUD UPSERT
+   ============================================================ */
+
+function cloudPayload(s){
+
+  /*
+   Enviamos los campos principales.
+   Campos adicionales quedan disponibles en metadata cuando
+   la tabla tenga una columna JSONB llamada metadata.
+  */
+
+  return {
+    id:s.id,
+    code:s.code,
+    company:s.company,
+    country:s.country,
+    location:s.location,
+    cnpj:s.cnpj||null,
+    cnae:s.cnae||null,
+    admin:s.admin||null,
+    manager:s.manager||null,
+    phone:s.phone||null,
+    whatsapp:s.whatsapp||null,
+    email:s.email||null,
+    website:s.website||null,
+    product:s.product||null,
+    origin:s.origin||null,
+    ffa:s.ffa||null,
+    moisture:s.moisture||null,
+    miu:s.miu||null,
+    insolubles:s.insolubles||null,
+    iodine:s.iodine||null,
+    tfm:s.tfm||null,
+    capacity:s.capacity||null,
+    consistency:s.consistency||null,
+    price:s.price||null,
+    currency:s.currency||null,
+    incoterm:s.incoterm||null,
+    payment:s.payment||null,
+    iscc:s.iscc||null,
+    export_history:s.exportHistory||null,
+    logistics:s.logistics||null,
+    environmental:s.environmental||null,
+    evidence:s.evidence||null,
+    internal:s.internal||null,
+    status:statusOf(s),
+    metadata:{
+      dd:s.dd||{},
+      contacted:!!s.contacted,
+      origin:s.origin||"",
+      exportHistory:s.exportHistory||"",
+      internal:s.internal||""
+    }
+  };
+}
+
+async function upsertCloudSupplier(s){
+
+  if(!astraDB){
+    toast("Error: cliente Supabase no inicializado.");
+    return false;
+  }
+
+  const payload=cloudPayload(s);
+
+  const {error}=await astraDB
+    .from(SUPPLIER_TABLE)
+    .upsert(payload,{onConflict:"id"});
+
+  if(error){
+    console.error("CLOUD UPSERT ERROR:",error);
+    toast("Error guardando en AstraDB: "+(error.message||"error"));
+    return false;
+  }
+
+  return true;
+
+}
+
+/* ============================================================
+   RENDER DASHBOARD
+   ============================================================ */
+
+function renderDashboard(){
+
+  const total=suppliers.length;
+  const verified=suppliers.filter(s=>statusOf(s)==="verified").length;
+  const review=suppliers.filter(s=>statusOf(s)==="review").length;
+  const pending=suppliers.filter(s=>statusOf(s)==="pending").length;
+
+  document.getElementById("mSuppliers").textContent=total;
+  document.getElementById("mVerified").textContent=verified;
+  document.getElementById("mReview").textContent=review;
+  document.getElementById("mPending").textContent=pending;
+  document.getElementById("mDocs").textContent=documents.length;
+
+  const main=suppliers.filter(isMainSupplier);
+  const contacted=suppliers.filter(s=>isContacted(s)&&!isMainSupplier(s));
+  const untouched=suppliers.filter(s=>!isContacted(s));
+
+  document.getElementById("pipelineDashboard").innerHTML=`
+
+    <div style="margin-bottom:17px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:6px">
+        <span>Proveedores principales</span>
+        <span>${main.length}</span>
+      </div>
+      <div class="progress">
+        <span style="width:${total?main.length/total*100:0}%"></span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:17px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:6px">
+        <span>Contrapartes contactadas</span>
+        <span>${contacted.length}</span>
+      </div>
+      <div class="progress">
+        <span style="width:${total?contacted.length/total*100:0}%;background:var(--orange)"></span>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:6px">
+        <span>Pipeline no trabajado</span>
+        <span>${untouched.length}</span>
+      </div>
+      <div class="progress">
+        <span style="width:${total?untouched.length/total*100:0}%;background:#b9c1c7"></span>
+      </div>
+    </div>
+  `;
+
+  const priority=[
+    ...main,
+    ...contacted.filter(s=>statusOf(s)!=="verified")
+  ].slice(0,8);
+
+  document.getElementById("priorityDashboard").innerHTML=
+    priority.length
+      ? priority.map(s=>`
+          <div style="padding:10px 0;border-bottom:1px solid #edf0f2">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <strong style="font-size:12px">${esc(s.company)}</strong>
+              ${statusBadge(s)}
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:5px">
+              ${esc(value(s.product,"Producto pendiente"))}
+              · ${esc(value(s.price,"Precio pendiente"))}
+            </div>
+          </div>
+        `).join("")
+      : `<div class="muted">No hay proveedores priorizados.</div>`;
+}
+
+/* ============================================================
+   SUPPLIER TABLE
+   ============================================================ */
+
+function renderSuppliers(){
+
+  const q=normalizedText(
+    document.getElementById("supplierSearch")?.value||""
+  );
+
+  const status=
+    document.getElementById("supplierStatusFilter")?.value||"all";
+
+  const country=
+    document.getElementById("supplierRegionFilter")?.value||"all";
+
+  let list=suppliers.filter(s=>{
+
+    const hay=normalizedText([
+      s.company,s.code,s.country,s.location,
+      s.cnpj,s.manager,s.phone,s.whatsapp,
+      s.email,s.product,s.origin
+    ].join(" "));
+
+    if(q && !hay.includes(q)) return false;
+
+    if(status!=="all" && statusOf(s)!==status) return false;
+
+    if(country!=="all" && s.country!==country) return false;
+
+    return true;
+  });
+
+  /*
+   Orden:
+   1. Olam / Renovar / FL
+   2. Contactados
+   3. No trabajados
+  */
+  list.sort((a,b)=>{
+
+    const rank=s=>{
+      if(isMainSupplier(s)) return 0;
+      if(isContacted(s)) return 1;
+      return 2;
+    };
+
+    return rank(a)-rank(b) ||
+      String(a.company||"").localeCompare(String(b.company||""));
+  });
+
+  const tbody=document.getElementById("supplierTable");
+
+  if(!list.length){
+    tbody.innerHTML=`
+      <tr>
+        <td colspan="10" style="text-align:center;padding:35px">
+          No se encontraron proveedores.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML=list.map(s=>{
+
+    const main=isMainSupplier(s);
+    const contacted=isContacted(s);
+
+    const rowClass=main
+      ?"priority-main"
+      :contacted
+        ?"priority-contact"
+        :"priority-unworked";
+
+    return `
+      <tr class="${rowClass}">
+        <td>
+          <div class="company">${esc(s.company)}</div>
+          <div class="code">${esc(s.code)}</div>
+        </td>
+
+        <td>
+          ${esc(value(s.location))}
+          <div class="code">${esc(value(s.country))}</div>
+        </td>
+
+        <td>${esc(value(s.product))}</td>
+
+        <td>${esc(value(s.ffa))}</td>
+
+        <td>${esc(value(s.capacity))}</td>
+
+        <td class="price">
+          ${esc(value(s.price))}
+          ${s.price && s.price!=="PENDIENTE" ? " "+esc(s.currency||"") : ""}
+        </td>
+
+        <td>${esc(value(s.incoterm))}</td>
+
+        <td>${statusBadge(s)}</td>
+
+        <td>
+          <span class="badge ${
+            verificationPercent(s)>=80
+              ?"badge-green"
+              :verificationPercent(s)>=40
+                ?"badge-orange"
+                :"badge-grey"
+          }">
+            ${verificationPercent(s)}%
+          </span>
+        </td>
+
+        <td>
+          <button class="btn" onclick="openSupplier('${esc(s.id)}')">
+            Abrir
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+/* ============================================================
+   SUPPLIER DETAIL
+   ============================================================ */
+
+function openSupplier(id){
+
+  selectedSupplierId=id;
+
+  const s=suppliers.find(x=>x.id===id);
+
+  if(!s) return;
+
+  const domains=[
+    ["legal","Existencia legal"],
+    ["operations","Capacidad operativa"],
+    ["quality","Calidad del producto"],
+    ["export","Historial exportador"],
+    ["commercial","Riesgo comercial"],
+    ["compliance","Compliance"]
+  ];
+
+  document.getElementById("supplierDetail").innerHTML=`
+
+    <div class="card">
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:21px;font-weight:900">${esc(s.company)}</div>
+          <div class="muted" style="font-size:11px;margin-top:5px">
+            ${esc(s.code)} · ${esc(value(s.location))} · ${esc(value(s.country))}
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          ${statusBadge(s)}
+          <button class="btn" onclick="editSupplier('${esc(s.id)}')">Editar</button>
+          <button class="btn btn-danger" onclick="deleteSupplier('${esc(s.id)}')">Eliminar</button>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="detail-grid">
+
+        ${field("CNPJ / Registro",s.cnpj)}
+        ${field("CNAE",s.cnae)}
+        ${field("Administrador",s.admin)}
+        ${field("Manager",s.manager)}
+        ${field("Teléfono",s.phone)}
+        ${field("WhatsApp",s.whatsapp)}
+        ${field("Email",s.email)}
+        ${field("Website",s.website)}
+        ${field("Producto",s.product,"field-wide")}
+        ${field("Origen / proceso",s.origin,"field-wide")}
+        ${field("FFA",s.ffa)}
+        ${field("Humedad",s.moisture)}
+        ${field("MIU",s.miu)}
+        ${field("Insolubles",s.insolubles)}
+        ${field("Iodine",s.iodine)}
+        ${field("TFM / TFA",s.tfm)}
+        ${field("Capacidad",s.capacity)}
+        ${field("Consistencia mensual",s.consistency)}
+        ${field("Precio",s.price)}
+        ${field("Moneda",s.currency)}
+        ${field("Incoterm",s.incoterm)}
+        ${field("Pago",s.payment)}
+        ${field("ISCC",s.iscc)}
+        ${field("Historial exportador",s.exportHistory)}
+        ${field("Logística",s.logistics,"field-wide")}
+        ${field("Licencia ambiental",s.environmental,"field-wide")}
+        ${field("Evidencia",s.evidence,"field-wide")}
+        ${field("Notas internas",s.internal,"field-wide")}
+
+      </div>
+
+      <div style="height:22px"></div>
+
+      <div class="card-title">Due Diligence</div>
+
+      <div class="dd-grid">
+        ${domains.map(([key,label])=>{
+          const state=ddState(s,key);
+
+          const labelMap={
+            verified:["badge-green","VERIFICADO"],
+            review:["badge-orange","EN DILIGENCIA"],
+            pending:["badge-grey","PENDIENTE"],
+            risk:["badge-red","RIESGO"]
+          };
+
+          const [cls,text]=labelMap[state];
+
+          return `
+            <div class="dd">
+              <div class="dd-title">${label}</div>
+              <div class="dd-status">
+                <span class="badge ${cls}">${text}</span>
+              </div>
+              <div class="dd-note">
+                ${
+                  state==="verified"
+                    ?"Evidencia suficiente según el estado actual."
+                    :state==="review"
+                      ?"Requiere evidencia adicional antes de cierre."
+                      :state==="risk"
+                        ?"Existe una inconsistencia que debe resolverse."
+                        :"Información crítica aún pendiente."
+                }
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+
+    </div>
+  `;
+
+  document.getElementById("supplierDetail").scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+}
+
+function field(label,v,cls=""){
+  return `
+    <div class="field ${cls}">
+      <div class="field-label">${label}</div>
+      <div class="field-value">${esc(value(v))}</div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   SUPPLIER FORM
+   ============================================================ */
+
+const FORM_FIELDS=[
+  ["fId","id"],
+  ["fCompany","company"],
+  ["fCountry","country"],
+  ["fLocation","location"],
+  ["fCnpj","cnpj"],
+  ["fCnae","cnae"],
+  ["fAdmin","admin"],
+  ["fManager","manager"],
+  ["fPhone","phone"],
+  ["fWhatsapp","whatsapp"],
+  ["fEmail","email"],
+  ["fWebsite","website"],
+  ["fProduct","product"],
+  ["fOrigin","origin"],
+  ["fFfa","ffa"],
+  ["fMoisture","moisture"],
+  ["fMiu","miu"],
+  ["fInsolubles","insolubles"],
+  ["fIodine","iodine"],
+  ["fTfm","tfm"],
+  ["fCapacity","capacity"],
+  ["fConsistency","consistency"],
+  ["fPrice","price"],
+  ["fCurrency","currency"],
+  ["fIncoterm","incoterm"],
+  ["fPayment","payment"],
+  ["fIscc","iscc"],
+  ["fExportHistory","exportHistory"],
+  ["fLogistics","logistics"],
+  ["fEnvironmental","environmental"],
+  ["fEvidence","evidence"],
+  ["fInternal","internal"]
+];
+
+function clearForm(){
+
+  FORM_FIELDS.forEach(([id])=>{
+    const el=document.getElementById(id);
+    if(el) el.value="";
+  });
+
+  document.getElementById("fCountry").value="Brasil";
+  document.getElementById("fCurrency").value="USD/MT";
+}
+
+function openNewSupplier(){
+
+  editingSupplierId=null;
+
+  clearForm();
+
+  document.getElementById("fId").value=crypto.randomUUID();
+
+  document.getElementById("modalTitle").textContent="Nuevo proveedor";
+
+  document.getElementById("supplierModal").classList.add("show");
+}
+
+function editSupplier(id){
+
+  const s=suppliers.find(x=>x.id===id);
+
+  if(!s) return;
+
+  editingSupplierId=id;
+
+  FORM_FIELDS.forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.value=s[key]??"";
+    }
+  });
+
+  document.getElementById("modalTitle").textContent=
+    "Editar proveedor — "+s.company;
+
+  document.getElementById("supplierModal").classList.add("show");
+}
+
+async function saveSupplier(){
+
+  const id=document.getElementById("fId").value || crypto.randomUUID();
+
+  const existing=suppliers.find(s=>s.id===id);
+
+  const s=existing || {
+    id,
+    code:nextSupplierCode(),
+    dd:{}
+  };
+
+  FORM_FIELDS.forEach(([fieldId,key])=>{
+    if(key==="id") return;
+    const el=document.getElementById(fieldId);
+    if(el) s[key]=el.value.trim();
+  });
+
+  s.id=id;
+
+  if(!s.code) s.code=nextSupplierCode();
+
+  s.contacted=true;
+
+  if(isMainSupplier(s)){
+    s.dd={
+      legal:"verified",
+      operations:"verified",
+      quality:"verified",
+      export:"verified",
+      commercial:"verified",
+      compliance:"verified"
+    };
+  }
+
+  if(!existing){
+    suppliers.push(s);
+  }
+
+  const ok=await upsertCloudSupplier(s);
+
+  if(!ok){
+    toast("Error: no se pudo guardar en AstraDB.");
+    return;
+  }
+
+  closeModal();
+
+  renderAll();
+
+  toast("Proveedor guardado en AstraDB.");
+}
+
+async function deleteSupplier(id){
+
+  const s=suppliers.find(x=>x.id===id);
+
+  if(!s) return;
+
+  if(!confirm(
+    `¿Eliminar ${s.company} de AstraDB?`
+  )) return;
+
+  try{
+    const {error}=await astraDB
+      .from(SUPPLIER_TABLE)
+      .delete()
+      .eq("id",id);
+
+    if(error){
+      console.error("CLOUD DELETE ERROR:",error);
+      toast("Error eliminando de AstraDB: "+(error.message||"error"));
+      return;
+    }
+
+    suppliers=suppliers.filter(x=>x.id!==id);
+
+    document.getElementById("supplierDetail").innerHTML="";
+
+    renderAll();
+
+    toast("Proveedor eliminado de AstraDB.");
+
+  }catch(e){
+    console.error("DELETE EXCEPTION:",e);
+    toast("Error eliminando: "+(e.message||"error"));
+  }
+}
+
+function closeModal(){
+  document.getElementById("supplierModal").classList.remove("show");
+}
+
+/* ============================================================
+   PRODUCTS
+   ============================================================ */
+
+function renderProducts(){
+
+  const map=new Map();
+
+  suppliers.forEach(s=>{
+    const product=value(s.product,"PENDIENTE");
+    const key=product.trim();
+
+    if(!map.has(key)) map.set(key,[]);
+    map.get(key).push(s);
+  });
+
+  const arr=Array.from(map.entries())
+    .sort((a,b)=>a[0].localeCompare(b[0]));
+
+  document.getElementById("productsGrid").innerHTML=
+    arr.map(([name,list])=>`
+
+      <div class="product-card">
+
+        <div class="product-name">${esc(name)}</div>
+
+        <div class="product-meta">
+          Proveedores: <strong>${list.length}</strong><br>
+          FFA registrado: ${esc(
+            [...new Set(
+              list.map(s=>value(s.ffa))
+            )].join(" · ")
+          )}<br>
+          Capacidad: ${esc(
+            [...new Set(
+              list.map(s=>value(s.capacity))
+            )].join(" · ")
+          )}
+        </div>
+
+      </div>
+    `).join("");
+}
+
+/* ============================================================
+   CONTACTS
+   ============================================================ */
+
+function renderContacts(){
+
+  const contacts=suppliers
+    .filter(s=>
+      s.manager ||
+      s.phone ||
+      s.whatsapp ||
+      s.email
+    )
+    .sort((a,b)=>
+      (isMainSupplier(a)?0:1)-
+      (isMainSupplier(b)?0:1)
+    );
+
+  document.getElementById("contactsGrid").innerHTML=
+    contacts.map(s=>`
+
+      <div class="contact">
+
+        <div class="contact-name">
+          ${esc(value(s.manager,"Contacto pendiente"))}
+        </div>
+
+        <div class="contact-company">
+          ${esc(s.company)}
+        </div>
+
+        <div class="contact-line">
+          Tel: ${esc(value(s.phone))}
+        </div>
+
+        <div class="contact-line">
+          WhatsApp: ${esc(value(s.whatsapp))}
+        </div>
+
+        <div class="contact-line">
+          Email: ${esc(value(s.email))}
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+/* ============================================================
+   DOCUMENTS
+   ============================================================ */
+
+function renderDocSupplierFilter(){
+
+  const select=document.getElementById("docSupplierFilter");
+
+  const current=select.value;
+
+  select.innerHTML=
+    `<option value="">Todos los proveedores</option>`+
+    suppliers.map(s=>
+      `<option value="${esc(s.id)}">${esc(s.company)}</option>`
+    ).join("");
+
+  select.value=current;
+}
+
+function renderDocuments(){
+
+  const filter=
+    document.getElementById("docSupplierFilter").value;
+
+  const list=documents.filter(d=>
+    !filter || d.supplierId===filter
+  );
+
+  document.getElementById("documentsList").innerHTML=
+    list.length
+      ? list.map(d=>{
+
+          const supplier=
+            suppliers.find(s=>s.id===d.supplierId);
+
+          return `
+            <div class="doc">
+
+              <div class="doc-main">
+                <div class="doc-name">
+                  ${esc(d.name)}
+                </div>
+
+                <div class="doc-meta">
+                  ${esc(d.category)}
+                  ·
+                  ${esc(
+                    supplier
+                      ? supplier.company
+                      : "Proveedor no asignado"
+                  )}
+                  ·
+                  ${esc(d.createdAt||"")}
+                </div>
+              </div>
+
+              <div style="display:flex;gap:7px">
+
+                ${
+                  d.dataUrl
+                    ? `<a
+                        class="btn"
+                        href="${d.dataUrl}"
+                        download="${esc(d.name)}"
+                      >Descargar</a>`
+                    : ""
+                }
+
+                <button
+                  class="btn btn-danger"
+                  onclick="deleteDocument('${esc(d.id)}')"
+                >
+                  Eliminar
+                </button>
+
+              </div>
+
+            </div>
+          `;
+
+        }).join("")
+      : `<div class="muted">No hay documentos cargados.</div>`;
+}
+
+async function uploadDocument(){
+
+  const fileEl=document.getElementById("docFile");
+  const file=fileEl.files[0];
+
+  if(!file){
+    toast("Selecciona un archivo.");
+    return;
+  }
+
+  if(!astraDB){
+    toast("Error: cliente Supabase no inicializado.");
+    return;
+  }
+
+  const supplierId=
+    document.getElementById("docSupplierFilter").value;
+
+  const category=
+    document.getElementById("docCategory").value;
+
+  const id=crypto.randomUUID();
+
+  const path=
+    `${supplierId||"unassigned"}/${Date.now()}-${file.name}`;
+
+  try{
+    const {error:upErr}=await astraDB.storage
+      .from(STORAGE_BUCKET)
+      .upload(path,file,{upsert:false});
+
+    if(upErr){
+      toast("Error subiendo archivo a Storage: "+(upErr.message||"error"));
+      return;
+    }
+
+    const {error:insErr}=await astraDB
+      .from(DOCUMENT_TABLE)
+      .insert({
+        id,
+        name:file.name,
+        category,
+        supplier_id:supplierId||null,
+        storage_path:path
+      });
+
+    if(insErr){
+      toast("Error guardando metadata en AstraDB: "+(insErr.message||"error"));
+      return;
+    }
+
+    documents.push({
+      id,
+      name:file.name,
+      category,
+      supplierId,
+      size:file.size,
+      type:file.type,
+      createdAt:new Date().toLocaleString(),
+      storage_path:path
+    });
+
+    saveLocal();
+
+  }catch(e){
+    toast("Error: "+(e.message||"error subiendo documento"));
+    return;
+  }
+
+  fileEl.value="";
+
+  renderDocuments();
+  renderDashboard();
+
+  toast("Documento subido a AstraDB Storage.");
+}
+
+function readFileAsDataUrl(file){
+
+  return new Promise((resolve,reject)=>{
+
+    const reader=new FileReader();
+
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=reject;
+
+    reader.readAsDataURL(file);
+  });
+}
+
+async function deleteDocument(id){
+
+  if(!confirm("¿Eliminar este documento?")) return;
+
+  const d=documents.find(x=>x.id===id);
+
+  if(!d) return;
+
+  try{
+    if(d.storage_path){
+      await astraDB.storage
+        .from(STORAGE_BUCKET)
+        .remove([d.storage_path]);
+    }
+
+    const {error}=await astraDB
+      .from(DOCUMENT_TABLE)
+      .delete()
+      .eq("id",id);
+
+    if(error){
+      toast("Error eliminando de AstraDB: "+(error.message||"error"));
+      return;
+    }
+
+    documents=documents.filter(x=>x.id!==id);
+
+    saveLocal();
+
+    renderDocuments();
+    renderDashboard();
+
+    toast("Documento eliminado de AstraDB.");
+
+  }catch(e){
+    toast("Error: "+(e.message||"error eliminando documento"));
+  }
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+function updateConnection(ok,text){
+
+  const el=document.getElementById("connection");
+
+  el.textContent=text;
+
+  el.classList.toggle("ok",ok);
+
+  const pill=document.getElementById("modePill");
+  const modeText=document.getElementById("modeText");
+
+  pill.classList.toggle("cloud",ok);
+
+  modeText.textContent=
+    ok
+      ?"ASTRADB · COMPARTIDO"
+      :"LOCAL";
+}
+
+function setDBStatus(text,type=""){
+
+  const el=document.getElementById("dbStatus");
+
+  el.className="config-note";
+
+  if(type==="success") el.classList.add("success");
+  if(type==="warning") el.classList.add("warning");
+  if(type==="error") el.classList.add("error");
+
+  el.innerHTML=esc(text);
+}
+
+function initSettings(){
+
+  document.getElementById("cfgUrl").value=SUPABASE_URL;
+
+  document.getElementById("cfgKey").value=
+    SUPABASE_PUBLISHABLE_KEY;
+
+  setDBStatus(
+    "Configuración AstraDB incorporada directamente en el código."
+  );
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+const PAGE_NAMES={
+  dashboard:"Resumen",
+  suppliers:"Proveedores",
+  products:"Productos",
+  contacts:"Contactos",
+  documents:"Documentación",
+  map:"Mapa mental",
+  intelligence:"Inteligencia",
+  settings:"Configuración"
+};
+
+function goPage(page){
+
+  document.querySelectorAll(".page").forEach(el=>{
+    el.style.display="none";
+  });
+
+  const target=document.getElementById("page-"+page);
+
+  if(target) target.style.display="block";
+
+  document.querySelectorAll(".nav button").forEach(btn=>{
+    btn.classList.toggle(
+      "active",
+      btn.dataset.page===page
+    );
+  });
+
+  document.getElementById("pageTitle").textContent=
+    PAGE_NAMES[page]||page;
+
+  if(page==="dashboard") renderDashboard();
+  if(page==="suppliers") renderSuppliers();
+  if(page==="products") renderProducts();
+  if(page==="contacts") renderContacts();
+  if(page==="documents"){
+    renderDocSupplierFilter();
+    renderDocuments();
+  }
+  if(page==="settings") initSettings();
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+
+function renderAll(){
+
+  renderDashboard();
+  renderSuppliers();
+  renderProducts();
+  renderContacts();
+  renderDocSupplierFilter();
+  renderDocuments();
+}
+
+/* ============================================================
+   EXPORT
+   ============================================================ */
+
+function exportJSON(){
+
+  const payload={
+    exportedAt:new Date().toISOString(),
+    source:cloudConnected
+      ?"AstraDB + local cache"
+      :"Local",
+    suppliers,
+    documents
+  };
+
+  const blob=new Blob(
+    [JSON.stringify(payload,null,2)],
+    {type:"application/json"}
+  );
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=
+    "astra-procurement-backup-"+
+    new Date().toISOString().slice(0,10)+
+    ".json";
+
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+  toast("Backup JSON generado.");
+}
+
+function resetLocal(){
+
+  if(!confirm(
+    "Esto limpiara la cache local y recargara los datos desde AstraDB. ¿Continuar?"
+  )) return;
+
+  localStorage.removeItem(LOCAL_KEY);
+  localStorage.removeItem(DOC_LOCAL_KEY);
+
+  suppliers=[];
+  documents=[];
+
+  loadCloudSuppliers().then(()=>{
+    renderAll();
+  });
+
+  toast("Recargando datos desde AstraDB...");
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+
+document.querySelectorAll(".nav button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    goPage(btn.dataset.page);
+  });
+});
+
+document.getElementById("supplierSearch")
+  .addEventListener("input",renderSuppliers);
+
+document.getElementById("supplierStatusFilter")
+  .addEventListener("change",renderSuppliers);
+
+document.getElementById("supplierRegionFilter")
+  .addEventListener("change",renderSuppliers);
+
+document.getElementById("newSupplierBtn")
+  .addEventListener("click",openNewSupplier);
+
+document.getElementById("closeModalBtn")
+  .addEventListener("click",closeModal);
+
+document.getElementById("cancelModalBtn")
+  .addEventListener("click",closeModal);
+
+document.getElementById("saveSupplierBtn")
+  .addEventListener("click",saveSupplier);
+
+document.getElementById("uploadDocBtn")
+  .addEventListener("click",uploadDocument);
+
+document.getElementById("docSupplierFilter")
+  .addEventListener("change",renderDocuments);
+
+document.getElementById("connectBtn")
+  .addEventListener("click",async()=>{
+    const ok=await connectAstraDB(true);
+
+    if(ok){
+      await loadCloudSuppliers();
+    }
+  });
+
+document.getElementById("cloudLoadBtn")
+  .addEventListener("click",loadCloudSuppliers);
+
+document.getElementById("refreshBtn")
+  .addEventListener("click",async()=>{
+
+    await loadCloudSuppliers(true);
+
+    renderAll();
+
+  });
+
+document.getElementById("exportBtn")
+  .addEventListener("click",exportJSON);
+
+document.getElementById("resetLocalBtn")
+  .addEventListener("click",resetLocal);
+
+/* ============================================================
+   STARTUP
+   ============================================================ */
+
+(function boot(){
+
+  initSupabase();
+
+  suppliers=[];
+  documents=[];
+
+  initSettings();
+
+  renderAll();
+
+  /*
+   Conectar a Supabase primero.
+   Si falla, mostrar el error — no usar datos locales como respaldo.
+  */
+  connectAstraDB(false).then(ok=>{
+
+    if(ok){
+      loadCloudSuppliers();
+    }else{
+      setDBStatus(
+        "No se pudo conectar a AstraDB. Verifica la configuracion.",
+        "error"
+      );
+    }
+
+  });
+
+})();
+</script>
+
+</body>
+</html>
