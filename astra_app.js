@@ -126,9 +126,24 @@ function supplierName(id){var s=suppliers.find(function(x){return x.id===id});re
    GENERIC DB
    ============================================================ */
 async function dbUpsert(table,payload){
-  var r=await supa.from(table).upsert(payload,{onConflict:"id"}).select();
-  if(r.error)throw r.error;
-  return r.data[0];
+  var r=await sup.from(table)
+    .upsert(payload,{onConflict:"id"})
+    .select()
+    .single();
+
+  if(r.error){
+    console.error("SUPABASE UPSERT ERROR:",r.error);
+    throw new Error(
+      "Supabase: "+
+      (r.error.message||"error")+
+      " | code="+
+      (r.error.code||"")+
+      " | details="+
+      (r.error.details||"")
+    );
+  }
+
+  return r.data;
 }
 async function dbDeleteRow(table,id){
   var r=await supa.from(table).delete().eq("id",id);
