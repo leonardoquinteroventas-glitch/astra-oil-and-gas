@@ -4,5 +4,6 @@
   },
   "dependencies": {
     "servor": "^4.0.2"
+    "@supabase/supabase-js": "latest"
   }
 }
