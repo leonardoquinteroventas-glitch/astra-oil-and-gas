@@ -1354,86 +1354,68 @@ function initSupabase(){
    CONNECTION TEST
    ============================================================ */
 
-async function connectAstraDB(showToast=false){
+   async function connectAstraDB(showToast = true) {
+  try {
+    console.log("ASTRA DB: iniciando conexión...");
+    console.log("ASTRA DB URL:", SUPABASE_URL);
+    console.log("ASTRA DB TABLE:", SUPPLIER_TABLE);
 
-  if(!astraDB){
+    initSupabase();
 
-    if(!initSupabase()){
-
-      cloudConnected=false;
-
-      updateConnection(
-        false,
-        "AstraDB · error"
-      );
-
-      if(showToast){
-        toast(
-          "Error: Supabase no pudo inicializarse."
-        );
-      }
-
-      return false;
-    }
-  }
-
-  try{
-
-    const result=await astraDB
+    const { data, error, status, statusText } = await sup
       .from(SUPPLIER_TABLE)
       .select("id")
       .limit(1);
 
-    if(result.error){
+    console.log("ASTRA DB RESPONSE:", {
+      data,
+      error,
+      status,
+      statusText
+    });
 
-      console.error(
-        "ASTRADB CONNECTION ERROR:",
-        result.error
-      );
+    if (error) {
+      console.error("ASTRA DB REAL ERROR:", JSON.stringify(error, null, 2));
 
-      cloudConnected=false;
-
-      updateConnection(
-        false,
-        "AstraDB · error"
-      );
-
-      setDBStatus(
-        "Supabase respondió con error: "+
-        (result.error.message||"error")+
-        " | code="+
-        (result.error.code||""),
-        "error"
-      );
-
-      if(showToast){
+      if (showToast) {
         toast(
-          "AstraDB: "+
-          (result.error.message||"error")
+          "SUPABASE ERROR: " +
+          (error.message || "sin mensaje") +
+          " | code=" +
+          (error.code || "") +
+          " | status=" +
+          (status || "")
         );
       }
 
+      cloudConnected = false;
       return false;
     }
 
-    cloudConnected=true;
+    cloudConnected = true;
 
-    updateConnection(
-      true,
-      "AstraDB · conectado"
-    );
+    console.log("ASTRA DB: CONEXIÓN OK");
 
-    setDBStatus(
-      "Conectado correctamente a public.suppliers.",
-      "success"
-    );
+    if (showToast) {
+      toast("AstraDB conectado correctamente.");
+    }
 
-    if(showToast){
+    return true;
+
+  } catch (e) {
+    console.error("ASTRA DB CATCH ERROR:", e);
+
+    if (showToast) {
       toast(
-        "AstraDB conectado correctamente."
+        "ASTRA DB CATCH: " +
+        (e.message || String(e))
       );
     }
 
+    cloudConnected = false;
+    return false;
+  }
+}
     return true;
 
   }catch(e){
