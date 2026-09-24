@@ -1,4 +1,11 @@
 const ASTRA_CONFIG = {
     appName: "Astra Procurement Intelligence OS",
-    environment: "development"
+    companyName: "Astra Oil and Gas",
+    website: "https://astraoilandgas.com",
+    environment: "development",
+
+    brand: {
+        logoUrl: "https://astraoilandgas.com",
+        accentSymbol: "✦"
+    }
 };

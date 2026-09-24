@@ -6,7 +6,7 @@ function initializeApp() {
     setupNavigation();
     updateSystemStatus("SYSTEM READY");
 
-    console.log("Astra Procurement Intelligence OS iniciado.");
+    console.log(`${ASTRA_CONFIG.companyName} — ${ASTRA_CONFIG.appName}`);
 }
 
 function setupNavigation() {
