@@ -11,19 +11,58 @@
 
 <body>
 
-    <header>
-        <h1>Astra Procurement Intelligence OS</h1>
-        <p>Procurement Intelligence · Feedstock Sourcing</p>
-    </header>
+    <div class="app-shell">
 
-    <main id="app">
+        <header class="app-header">
+            <div>
+                <h1>Astra Procurement Intelligence OS</h1>
+                <p>Feedstock Sourcing · Procurement Intelligence</p>
+            </div>
 
-        <section id="dashboard">
-            <h2>Dashboard</h2>
-            <p>Sistema iniciado correctamente.</p>
-        </section>
+            <div id="systemStatus" class="system-status">
+                SYSTEM INITIALIZING
+            </div>
+        </header>
 
-    </main>
+        <nav class="main-nav">
+            <button data-page="dashboard">Dashboard</button>
+            <button data-page="suppliers">Suppliers</button>
+            <button data-page="products">Products</button>
+            <button data-page="contacts">Contacts</button>
+            <button data-page="documents">Documents</button>
+            <button data-page="map">Mental Map</button>
+        </nav>
+
+        <main id="app">
+
+            <section id="page-dashboard" class="page">
+                <h2>Dashboard</h2>
+                <p>Procurement intelligence system.</p>
+            </section>
+
+            <section id="page-suppliers" class="page hidden">
+                <h2>Suppliers</h2>
+            </section>
+
+            <section id="page-products" class="page hidden">
+                <h2>Products</h2>
+            </section>
+
+            <section id="page-contacts" class="page hidden">
+                <h2>Contacts</h2>
+            </section>
+
+            <section id="page-documents" class="page hidden">
+                <h2>Documents</h2>
+            </section>
+
+            <section id="page-map" class="page hidden">
+                <h2>Mental Map</h2>
+            </section>
+
+        </main>
+
+    </div>
 
     <script src="config.js"></script>
     <script src="app.js"></script>

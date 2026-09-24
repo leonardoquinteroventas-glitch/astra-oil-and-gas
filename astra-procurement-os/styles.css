@@ -1,8 +1,3 @@
-/* ============================================================
-   ASTRA PROCUREMENT INTELLIGENCE OS
-   Base Styles
-   ============================================================ */
-
 * {
     box-sizing: border-box;
 }
@@ -20,33 +15,65 @@ body {
     color: #17202a;
 }
 
-header {
+.app-shell {
+    min-height: 100vh;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 24px 32px;
     background: #111827;
     color: white;
 }
 
-header h1 {
+.app-header h1 {
     margin: 0 0 6px;
     font-size: 24px;
 }
 
-header p {
+.app-header p {
     margin: 0;
     color: #cbd5e1;
+}
+
+.system-status {
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.main-nav {
+    display: flex;
+    gap: 8px;
+    padding: 12px 32px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.main-nav button {
+    border: 0;
+    background: transparent;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.main-nav button:hover {
+    background: #f1f5f9;
 }
 
 main {
     padding: 32px;
 }
 
-section {
+.page {
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: 24px;
 }
 
-h2 {
-    margin-top: 0;
+.hidden {
+    display: none;
 }
